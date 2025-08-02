@@ -45,10 +45,15 @@ export function FieldRenderer({ field, value, onChange, error }: FieldRendererPr
           type="number"
           label={field.label}
           placeholder={field.placeholder}
-          value={value !== undefined ? String(value) : ''}
+          value={value !== undefined && value !== null ? String(value) : ''}
           onChange={(e) => {
             const val = e.target.value;
-            onChange(val === '' ? undefined : Number(val));
+            if (val === '') {
+              onChange(undefined);
+            } else {
+              const numVal = Number(val);
+              onChange(isNaN(numVal) ? val : numVal);
+            }
           }}
           min={field.min}
           max={field.max}
@@ -65,7 +70,7 @@ export function FieldRenderer({ field, value, onChange, error }: FieldRendererPr
               {field.label} {field.required && <span className="text-red-500">*</span>}
             </label>
             <Toggle
-              checked={value || false}
+              checked={Boolean(value)}
               onChange={onChange}
             />
             {error && <p className="text-sm text-red-600">{error}</p>}
@@ -78,7 +83,7 @@ export function FieldRenderer({ field, value, onChange, error }: FieldRendererPr
               <input
                 type="checkbox"
                 id={field.id}
-                checked={value || false}
+                checked={Boolean(value)}
                 onChange={(e) => onChange(e.target.checked)}
                 className={`h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded ${error ? 'border-red-300' : ''}`}
               />
@@ -96,7 +101,7 @@ export function FieldRenderer({ field, value, onChange, error }: FieldRendererPr
         <Select
           label={field.label}
           value={value || ''}
-          onChange={(e) => onChange(e.target.value || undefined)}
+          onChange={(e) => onChange(e.target.value === '' ? undefined : e.target.value)}
           options={field.options.map(opt => ({ value: opt.value, label: opt.label }))}
           placeholder="Select an option..."
           error={error}

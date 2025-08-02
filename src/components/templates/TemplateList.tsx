@@ -29,11 +29,18 @@ export function TemplateList({ onSelectTemplate, onPreviewTemplate, onFillForm }
         onSelectTemplate(template);
       } catch (error) {
         console.error('Error creating template:', error);
+        alert('Failed to create template. Please try again.');
       }
     }
   };
 
   const canCreateTemplate = templates.length < 5;
+
+  const handleDeleteTemplate = (templateId: string, templateName: string) => {
+    if (window.confirm(`Are you sure you want to delete "${templateName}"? This action cannot be undone and will also delete all form submissions for this template.`)) {
+      deleteTemplate(templateId);
+    }
+  };
 
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-6">
@@ -86,7 +93,10 @@ export function TemplateList({ onSelectTemplate, onPreviewTemplate, onFillForm }
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => deleteTemplate(template.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteTemplate(template.id, template.name);
+                  }}
                   className="text-red-600 hover:text-red-700 hover:bg-red-50 ml-2"
                 >
                   <Trash2 size={14} />
@@ -94,7 +104,16 @@ export function TemplateList({ onSelectTemplate, onPreviewTemplate, onFillForm }
               </div>
               
               <div className="text-sm text-gray-500 mb-4">
-                <p>{template.sections.length} sections</p>
+                <div className="space-y-1">
+                  <p>{template.sections.length} section{template.sections.length !== 1 ? 's' : ''}</p>
+                  <p>
+                    {template.sections.reduce((total, section) => 
+                      total + section.fields.filter(f => f.type !== 'label').length, 0
+                    )} input field{template.sections.reduce((total, section) => 
+                      total + section.fields.filter(f => f.type !== 'label').length, 0
+                    ) !== 1 ? 's' : ''}
+                  </p>
+                </div>
                 <p>Created {formatDate(template.createdAt)}</p>
                 <p>Updated {formatDate(template.updatedAt)}</p>
               </div>

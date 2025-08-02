@@ -48,7 +48,14 @@ export function FormView({ template, onBack }: FormViewProps) {
       }
 
       // Submit the form
-      submitForm(template.id, formData);
+      const filteredData = Object.fromEntries(
+        Object.entries(formData).filter(([key, value]) => {
+          const field = nonLabelFields.find(f => f.id === key);
+          return field && (value !== undefined && value !== null && value !== '');
+        })
+      );
+      
+      submitForm(template.id, filteredData);
       setIsSubmitted(true);
       setErrors([]);
     } catch (error) {

@@ -46,7 +46,12 @@ export function SectionBuilder({
   };
 
   const handleDeleteSection = () => {
-    if (window.confirm(`Are you sure you want to delete the section "${section.title}"? This will also delete all fields in this section.`)) {
+    const fieldCount = section.fields.length;
+    const message = fieldCount > 0 
+      ? `Are you sure you want to delete the section "${section.title}"? This will also delete ${fieldCount} field${fieldCount === 1 ? '' : 's'} in this section.`
+      : `Are you sure you want to delete the section "${section.title}"?`;
+      
+    if (window.confirm(message)) {
       onDeleteSection();
     }
   };

@@ -6,6 +6,11 @@ export function useFormSubmissions() {
   const [submissions, setSubmissions] = useLocalStorage<FormSubmission[]>('form-submissions', []);
 
   const submitForm = (templateId: string, data: Record<string, any>): FormSubmission => {
+    // Validate that we have some data to submit
+    if (!data || Object.keys(data).length === 0) {
+      throw new Error('No data to submit');
+    }
+
     const submission: FormSubmission = {
       id: generateId(),
       templateId,
@@ -13,7 +18,7 @@ export function useFormSubmissions() {
       submittedAt: new Date(),
     };
 
-    setSubmissions([...submissions, submission]);
+    setSubmissions(prev => [...prev, submission]);
     return submission;
   };
 
@@ -22,7 +27,11 @@ export function useFormSubmissions() {
   };
 
   const deleteSubmission = (submissionId: string) => {
-    setSubmissions(submissions.filter(submission => submission.id !== submissionId));
+    setSubmissions(prev => prev.filter(submission => submission.id !== submissionId));
+  };
+
+  const getAllSubmissions = () => {
+    return submissions;
   };
 
   return {
@@ -30,5 +39,6 @@ export function useFormSubmissions() {
     submitForm,
     getSubmissionsByTemplate,
     deleteSubmission,
+    getAllSubmissions,
   };
 }

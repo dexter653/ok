@@ -23,25 +23,24 @@ export function useTemplates() {
       updatedAt: new Date(),
     };
 
-    setTemplates([...templates, newTemplate]);
+    setTemplates(prev => [...prev, newTemplate]);
     setActiveTemplateId(newTemplate.id);
     return newTemplate;
   };
 
   const updateTemplate = (templateId: string, updates: Partial<Omit<Template, 'id' | 'createdAt'>>) => {
     setTemplates(prevTemplates => {
-      const updatedTemplates = prevTemplates.map(template => 
+      return prevTemplates.map(template => 
         template.id === templateId 
           ? { ...template, ...updates, updatedAt: new Date() }
           : template
       );
-      return updatedTemplates;
     });
   };
 
   const deleteTemplate = (templateId: string) => {
     if (window.confirm('Are you sure you want to delete this template? This action cannot be undone.')) {
-      setTemplates(templates.filter(template => template.id !== templateId));
+      setTemplates(prev => prev.filter(template => template.id !== templateId));
       if (activeTemplateId === templateId) {
         setActiveTemplateId(null);
       }
@@ -49,17 +48,17 @@ export function useTemplates() {
   };
 
   const addSection = (templateId: string, title: string) => {
-    const template = templates.find(t => t.id === templateId);
-    if (!template) return;
-
-    const newSection: Section = {
-      id: generateId(),
-      title,
-      fields: [],
-      order: template.sections.length,
-    };
-
     setTemplates(prevTemplates => {
+      const template = prevTemplates.find(t => t.id === templateId);
+      if (!template) return prevTemplates;
+
+      const newSection: Section = {
+        id: generateId(),
+        title,
+        fields: [],
+        order: template.sections.length,
+      };
+
       return prevTemplates.map(t => 
         t.id === templateId 
           ? { ...t, sections: [...t.sections, newSection], updatedAt: new Date() }

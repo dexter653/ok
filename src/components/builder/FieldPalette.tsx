@@ -75,7 +75,7 @@ export function FieldPalette({ onAddField, sections }: FieldPaletteProps) {
 
   // Update selected section when sections change
   React.useEffect(() => {
-    if (sections.length > 0 && !sections.find(s => s.id === selectedSection)) {
+    if (sections.length > 0 && (!selectedSection || !sections.find(s => s.id === selectedSection))) {
       setSelectedSection(sections[0].id);
     }
   }, [sections, selectedSection]);

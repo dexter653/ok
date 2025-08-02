@@ -40,6 +40,13 @@ export function TemplateBuilder({ template, onBack, onPreview }: TemplateBuilder
   const handleSaveTemplate = async () => {
     setSaveStatus('saving');
     try {
+      // Validate template before saving
+      if (!templateName.trim()) {
+        alert('Template name is required');
+        setSaveStatus('idle');
+        return;
+      }
+      
       updateTemplate(template.id, {
         name: templateName.trim(),
         description: templateDescription.trim() || undefined,
@@ -59,6 +66,21 @@ export function TemplateBuilder({ template, onBack, onPreview }: TemplateBuilder
       addSection(template.id, sectionTitle.trim());
       setSectionTitle('');
       setIsAddingSection(false);
+    }
+  };
+
+  const hasUnsavedChanges = () => {
+    return templateName !== currentTemplate.name || 
+           templateDescription !== (currentTemplate.description || '');
+  };
+
+  const handleBack = () => {
+    if (hasUnsavedChanges()) {
+      if (window.confirm('You have unsaved changes. Are you sure you want to leave?')) {
+        onBack();
+      }
+    } else {
+      onBack();
     }
   };
 
@@ -85,7 +107,7 @@ export function TemplateBuilder({ template, onBack, onPreview }: TemplateBuilder
       <div className="bg-white border-b border-gray-200 px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" onClick={onBack} size="sm">
+            <Button variant="ghost" onClick={handleBack} size="sm">
               <ArrowLeft size={16} />
               Back
             </Button>

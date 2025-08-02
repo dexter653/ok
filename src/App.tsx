@@ -42,6 +42,24 @@ function App() {
     setSelectedTemplate(null);
   };
 
+  const handleBackFromForm = () => {
+    // If we came from form selector, go back there, otherwise go to list
+    if (currentView === 'form' && selectedTemplate) {
+      // Check if template has fillable fields
+      const hasInputFields = selectedTemplate.sections.some(section => 
+        section.fields.some(field => field.type !== 'label')
+      );
+      
+      if (hasInputFields) {
+        setCurrentView('form-selector');
+      } else {
+        setCurrentView('list');
+      }
+    } else {
+      setCurrentView('list');
+    }
+    setSelectedTemplate(null);
+  };
   // Get fresh template data when switching views
   const getCurrentTemplate = () => {
     if (!selectedTemplate) return null;
@@ -77,7 +95,7 @@ function App() {
       {currentView === 'form' && getCurrentTemplate() && (
         <FormView
           template={getCurrentTemplate()!}
-          onBack={currentView === 'form' && selectedTemplate ? handleBackToSelector : handleBackToList}
+          onBack={handleBackFromForm}
         />
       )}
     </div>

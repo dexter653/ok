@@ -80,7 +80,10 @@ export function FieldEditor({ field, onSave, onCancel }: FieldEditorProps) {
   };
 
   const handleSave = () => {
-    if (!label.trim()) return;
+    if (!label.trim()) {
+      alert('Field label is required');
+      return;
+    }
 
     let fieldData: Omit<Field, 'id' | 'order'>;
 
@@ -103,13 +106,22 @@ export function FieldEditor({ field, onSave, onCancel }: FieldEditorProps) {
         break;
         
       case 'number':
+        // Validate min/max values
+        const minVal = min ? Number(min) : undefined;
+        const maxVal = max ? Number(max) : undefined;
+        
+        if (minVal !== undefined && maxVal !== undefined && minVal > maxVal) {
+          alert('Minimum value cannot be greater than maximum value');
+          return;
+        }
+        
         fieldData = {
           type: 'number',
           label: label.trim(),
           required,
           placeholder: placeholder.trim() || undefined,
-          min: min ? Number(min) : undefined,
-          max: max ? Number(max) : undefined,
+          min: minVal,
+          max: maxVal,
         };
         break;
         
@@ -124,7 +136,18 @@ export function FieldEditor({ field, onSave, onCancel }: FieldEditorProps) {
         
       case 'enum':
         const validOptions = options.filter(opt => opt.label.trim() && opt.value.trim());
-        if (validOptions.length < 1) return;
+        if (validOptions.length < 1) {
+          alert('At least one option is required for dropdown fields');
+          return;
+        }
+        
+        // Check for duplicate values
+        const values = validOptions.map(opt => opt.value.trim());
+        const uniqueValues = new Set(values);
+        if (values.length !== uniqueValues.size) {
+          alert('Option values must be unique');
+          return;
+        }
         
         fieldData = {
           type: 'enum',
@@ -145,7 +168,25 @@ export function FieldEditor({ field, onSave, onCancel }: FieldEditorProps) {
     onSave(fieldData);
   };
 
-  const canSave = label.trim() && (fieldType !== 'enum' || options.some(opt => opt.label.trim() && opt.value.trim()));
+  const canSave = () => {
+    if (!label.trim()) return false;
+    
+    if (fieldType === 'enum') {
+      const validOptions = options.filter(opt => opt.label.trim() && opt.value.trim());
+      return validOptions.length > 0;
+    }
+    
+    if (fieldType === 'number') {
+      const minVal = min ? Number(min) : undefined;
+      const maxVal = max ? Number(max) : undefined;
+      
+      if (minVal !== undefined && maxVal !== undefined && minVal > maxVal) {
+        return false;
+      }
+    }
+    
+    return true;
+  };
 
   return (
     <div className="space-y-6">
@@ -266,7 +307,7 @@ export function FieldEditor({ field, onSave, onCancel }: FieldEditorProps) {
         <Button variant="secondary" onClick={onCancel}>
           Cancel
         </Button>
-        <Button onClick={handleSave} disabled={!canSave}>
+        <Button onClick={handleSave} disabled={!canSave()}>
           {field ? 'Update Field' : 'Add Field'}
         </Button>
       </div>

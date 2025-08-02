@@ -7,7 +7,8 @@ export function validateForm(fields: Field[], formData: Record<string, any>): Va
     if (field.type === 'label') return; // Skip label fields
 
     const value = formData[field.id];
-    const isEmpty = value === undefined || value === null || value === '';
+    const isEmpty = value === undefined || value === null || value === '' || 
+                   (typeof value === 'string' && value.trim() === '');
 
     // Required field validation
     if (field.required && isEmpty) {
@@ -47,10 +48,10 @@ export function validateForm(fields: Field[], formData: Record<string, any>): Va
         break;
 
       case 'text':
-        if (typeof value !== 'string') {
+        if (typeof value !== 'string' || value.trim().length === 0) {
           errors.push({
             fieldId: field.id,
-            message: `${field.label} must be text`,
+            message: `${field.label} cannot be empty`,
           });
         }
         break;
