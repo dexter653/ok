@@ -113,8 +113,18 @@ export function FormView({ template, onBack }: FormViewProps) {
 
       {template.sections.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No sections in this template</h3>
-          <p className="text-gray-600 mb-6">This template doesn't have any sections or fields yet.</p>
+          <AlertCircle size={48} className="text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">Form Not Ready</h3>
+          <p className="text-gray-600 mb-6">This template doesn't have any sections or input fields yet.</p>
+          <Button onClick={onBack}>
+            Back to Templates
+          </Button>
+        </div>
+      ) : template.sections.every(section => section.fields.every(field => field.type === 'label')) ? (
+        <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
+          <AlertCircle size={48} className="text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No Input Fields</h3>
+          <p className="text-gray-600 mb-6">This template only contains labels. Add some input fields to make it fillable.</p>
           <Button onClick={onBack}>
             Back to Templates
           </Button>

@@ -7,7 +7,10 @@
     "dev": "npx vite",
     "build": "npx vite build",
     "lint": "eslint .",
-    "preview": "npx vite preview"
+    "preview": "npx vite preview",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run"
   },
   "dependencies": {
     "lucide-react": "^0.344.0",
